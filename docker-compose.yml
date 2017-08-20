@@ -1,0 +1,72 @@
+version: '2'
+services:
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - etc:/etc/prometheus/
+      - data:/prometheus
+    command:
+      - '-config.file=/etc/prometheus/prometheus.yml'
+      - '-storage.local.path=/prometheus'
+      - '-alertmanager.url=http://alertmanager:9093'
+    links:
+      - cadvisor:cadvisor
+      - alertmanager:alertmanager
+    depends_on:
+      - cadvisor
+    labels:
+      io.rancher.container.pull_image: always
+
+  alertmanager:
+    image: prom/alertmanager
+    volumes:
+    - alertmanager-etc:/etc/alertmanager/
+    - alertmanager-data:/alertmanager
+    command:
+      - '-config.file=/etc/alertmanager/config.yml'
+      - '-storage.path=/alertmanager'
+    labels:
+      io.rancher.container.pull_image: always
+
+  node-exporter:
+    container_name: node-exporter
+    image: prom/node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command: '-collector.procfs=/host/proc -collector.sysfs=/host/sys -collector.filesystem.ignored-mount-points="^(/rootfs|/host|)/(sys|proc|dev|host|etc)($$|/)" collector.filesystem.ignored-fs-types="^(sys|proc|auto|cgroup|devpts|ns|au|fuse\.lxc|mqueue)(fs|)$$"'
+    labels:
+      io.rancher.container.pull_image: always
+
+  cadvisor:
+    image: google/cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    labels:
+      io.rancher.container.pull_image: always
+
+  mysqld-exporter:
+    container_name: mysqld-exporter
+    image: prom/mysqld-exporter
+    env_file:
+    - .env
+    labels:
+      io.rancher.container.pull_image: always
+
+
+volumes:
+  etc:
+    driver: "local"
+  data:
+    driver: "local"
+  alertmanager-etc:
+    driver: "local"
+  alertmanager-data:
+    driver: "local"
+

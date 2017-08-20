@@ -1,0 +1,57 @@
+version: '2'
+services:
+
+  prometheus:
+    scale: 1
+    start_on_create: true
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 9090
+      unhealthy_threshold: 3
+      interval: 2000
+      strategy: recreate
+
+  alertmanager:
+    scale: 1
+    start_on_create: true
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 9093
+      unhealthy_threshold: 3
+      interval: 2000
+      strategy: recreate
+
+  node-exporter:
+    scale: 1
+    start_on_create: true
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 9100
+      unhealthy_threshold: 3
+      interval: 2000
+      strategy: recreate
+
+  cadvizor:
+    scale: 1
+    start_on_create: true
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 8080
+      unhealthy_threshold: 3
+      interval: 2000
+      strategy: recreate
+
+  mysqld-exporter:
+    scale: 1
+    start_on_create: true
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 9104
+      unhealthy_threshold: 3
+      interval: 2000
+      strategy: recreate
