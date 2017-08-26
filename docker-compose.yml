@@ -4,6 +4,9 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
     volumes:
       - etc:/etc/prometheus/
       - data:/prometheus
@@ -17,22 +20,33 @@ services:
     depends_on:
       - cadvisor
     labels:
+      service: prometheus
       io.rancher.container.pull_image: always
+      io.rancher.container.hostname_override: container_name
 
   alertmanager:
     image: prom/alertmanager
+    container_name: alertmanager
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
     volumes:
-    - alertmanager-etc:/etc/alertmanager/
-    - alertmanager-data:/alertmanager
+    - alertmanager_etc:/etc/alertmanager/
+    - alertmanager_data:/alertmanager
     command:
       - '-config.file=/etc/alertmanager/config.yml'
       - '-storage.path=/alertmanager'
     labels:
+      service: alertmanager
       io.rancher.container.pull_image: always
+      io.rancher.container.hostname_override: container_name
 
   node-exporter:
-    container_name: node-exporter
     image: prom/node-exporter
+    container_name: node-exporter
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -40,9 +54,14 @@ services:
     command: '-collector.procfs=/host/proc -collector.sysfs=/host/sys -collector.filesystem.ignored-mount-points="^(/rootfs|/host|)/(sys|proc|dev|host|etc)($$|/)" collector.filesystem.ignored-fs-types="^(sys|proc|auto|cgroup|devpts|ns|au|fuse\.lxc|mqueue)(fs|)$$"'
     labels:
       io.rancher.container.pull_image: always
+      io.rancher.container.hostname_override: container_name
 
   cadvisor:
     image: google/cadvisor
+    container_name: cadvisor
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -50,14 +69,18 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
     labels:
       io.rancher.container.pull_image: always
+      io.rancher.container.hostname_override: container_name
 
   mysqld-exporter:
-    container_name: mysqld-exporter
     image: prom/mysqld-exporter
-    env_file:
-    - .env
+    container_name: mysqld-exporter
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    env_file: ${PWD}/.env
     labels:
       io.rancher.container.pull_image: always
+      io.rancher.container.hostname_override: container_name
 
 
 volumes:
@@ -65,8 +88,8 @@ volumes:
     driver: "local"
   data:
     driver: "local"
-  alertmanager-etc:
+  alertmanager_etc:
     driver: "local"
-  alertmanager-data:
+  alertmanager_data:
     driver: "local"
 
