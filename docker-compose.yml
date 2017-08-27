@@ -78,6 +78,7 @@ services:
     stdin_open: true
     tty: true
     env_file: ${PWD}/.env
+    command: '-collect.info_schema.processlist=true'
     labels:
       io.rancher.container.pull_image: always
       io.rancher.container.hostname_override: container_name
